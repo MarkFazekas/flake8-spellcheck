@@ -2,7 +2,8 @@ import os
 import re
 import sys
 import tokenize
-from string import ascii_lowercase, ascii_uppercase, digits
+import unicodedata as ud
+from string import digits
 
 from .version import version as __version__
 
@@ -12,6 +13,11 @@ if sys.version_info >= (3, 7):
     from importlib.resources import read_text
 else:
     from importlib_resources import read_text  # noqa
+
+
+all_unicode = "".join(chr(i) for i in range(65536))
+unicode_lowercase_letters = "".join(c for c in all_unicode if ud.category(c) == "Ll")
+unicode_uppercase_letters = "".join(c for c in all_unicode if ud.category(c) == "Lu")
 
 
 # Really simple detection function
@@ -33,12 +39,12 @@ def parse_camel_case(name, position):
     buffer = ""
     for c in name:
         index += 1
-        if c in ascii_lowercase or c in digits or c in ("'"):
+        if c in unicode_lowercase_letters or c in digits or c in ("'"):
             buffer += c
         else:
             if buffer:
                 yield (position[0], start), buffer
-            if c in ascii_uppercase:
+            if c in unicode_uppercase_letters:
                 buffer = c
                 start = index - 1
             else:
@@ -55,7 +61,11 @@ def parse_snake_case(name, position):
     buffer = ""
     for c in name:
         index += 1
-        if c in ascii_lowercase or c in digits or c in ascii_uppercase:
+        if (
+            c in unicode_lowercase_letters
+            or c in digits
+            or c in unicode_uppercase_letters
+        ):
             buffer += c
         else:
             if buffer:
