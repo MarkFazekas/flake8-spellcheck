@@ -73,11 +73,7 @@ def parse_snake_case(name: str, position: Position) -> Iterator[Tuple[Position, 
     buffer = ""
     for c in name:
         index += 1
-        if (
-            c in unicode_lowercase_letters
-            or c in digits
-            or c in unicode_uppercase_letters
-        ):
+        if c in unicode_lowercase_letters or c in digits or c in unicode_uppercase_letters:
             buffer += c
         else:
             if buffer:
